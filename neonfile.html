@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM - Drawing with Damping and Blitting on the Canvas with JavaScript</title>
+
+<!-- Welcome to ZIM at http://zimjs.com - Code Interactive Media Pizzazz! 	        -->
+<!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS http://createjs.com -->
+<!-- Founded by Inventor Dan Zen - http://danzen.com - Canadian New Media Award Winner 	-->
+<!-- ZIM is free to use. You can donate to help improve ZIM at http://zimjs.com/donate 	-->
+
+<script src="https://d309knd7es5f10.cloudfront.net/createjs.min.js"></script>
+<script>
+	var zon = true; // set to false to turn off console messages from zim
+	var zns = false; // set to true to require zim namespace - eg. new zim.Frame()
+</script>
+<script src="https://d309knd7es5f10.cloudfront.net/zim_6.8.0.js"></script>
+<!-- use zimjs.com/code/distill for minified individual functions! -->
+
+<script>
+
+var frame = new Frame();
+frame.on("ready", function() {
+
+    var stage = frame.stage;
+	var stageW = stage.width;
+	var stageH = stage.height;
+    frame.color = frame.black;
+
+    // see http://zimjs.com/code/learn.html for video and code tutorials
+    // see http://zimjs.com/code/docs.html for documentation
+    // see http://zimjs.com/code/bits.html for 64 Interactive Media techniques
+
+	// ~~~~~~~~~~~~ DAMP
+	// set up ZIM Damp objects to later apply damping to the drawing position
+	// these have a default damp of .1
+	// so instead of going directly to the mouseX and mouseY they go .1 the way there
+	// and makes the drawing smoother
+	var dampX = new Damp();
+	var dampY = new Damp();
+
+	// ~~~~~~~~~~~~ FADE
+	// set the stage to not clear when updating
+	// this will allow us to use a fade technique
+	stage.autoClear = false;
+	// each draw of the uncleared canvas draws (stamps) this faint rectangle overtop of shape
+	// the shape is cleared each time so the old shape line segments are layered between the stamped rectangles
+	// giving the shape a faded out look - this is the fade technique
+	// Rectangle defaults to black - otherwise, color is the third parameter
+	var fader = new Rectangle(stageW, stageH).addTo(stage).alp(.01);
+
+
+	// ~~~~~~~~~~~~ EVENTS
+	// stage.on("mousedown", function) only works if something is on the stage under the mouse
+	// in this case, the fader is there so we could use mousedown
+	// but it is probably better to demonstrate with stagemousedown as it works in all cases
+	var drawCheck = false;
+	stage.on("stagemousedown", function() {
+		drawCheck = true;
+		lastX = stage.mouseX;
+		lastY = stage.mouseY;
+		dampX.immediate(lastX);  // to avoid damping from 0 to mouse position
+		dampY.immediate(lastY);
+		fader.alpha = .01; // for a slow fade out as drawing
+	});
+	stage.on("stagemouseup", function() {
+		drawCheck = false;
+		shape.graphics.clear(); // clear the last thing drawn otherwise that shape stays alive on top
+		fader.alpha = .2; // for a fast fade out when mouse up
+	});
+
+	// ~~~~~~~~~~~~ DRAW IN TICKER
+	// do not use mousemove as damping needs to work even when not moving the mouse
+	// so the drawing has time to catch up to the mouse
+	// so we use a Ticker, which runs all the time and automatically updates the stage
+	var grow = true;
+	var thickness = 3;
+	var hue = 0;
+	var shape = new Shape().addTo(stage);
+	Ticker.add(function() { // do not use pressmove when damping
+		if (drawCheck) {
+			thickness = grow ? ++thickness : --thickness; // ternary opertation with the pre-assignment increment/decrement operators when assigning
+			if (thickness >= 50 || thickness <= 10) grow = !grow;
+
+			// damp towards where we want to go rather than go right to it
+			currentX = dampX.convert(stage.mouseX);
+			currentY = dampY.convert(stage.mouseY);
+
+			shape.graphics
+				.c() // clear each time and let stage.autoClear=false handle memory
+				.s("hsl(" + ++hue%360 + ", 100%, 50%)") // pre-assignmnet incrementor and modulus to always stay 0-359 for hue
+				.ss(thickness, "round")
+				.mt(lastX, lastY)
+				.lt(currentX, currentY);
+
+			lastX = currentX; // no ES6 for me yet... problems on older devices...
+			lastY = currentY;
+		}
+	});
+
+	// ~~~~~~~~~~~~ RESIZE
+	// we need to resize the fader rectangle when the browser resizes
+	frame.on("resize", function() {
+		fader.scaleTo(stage, 100, 100, "both"); // both, otherwise fits to 100% width or 100% height
+		// watch out for
+		// fader.width = stage.width
+		// fader.height = stage.height
+		// as width and height maintain proportion
+		// Alternatively, could use:
+		// fader.widthOnly = stage.width
+		// fader.heightOnly = stage.height
+	});
+
+}); // end of ready
+
+// second frame for interface
+var frameTop = new Frame(); // allow mouse events to go to first frame
+frameTop.on("ready", function() {
+	var stage = frameTop.stage;
+	stage.nextStage = frame.stage;
+	frameTop.loadAssets(["icon_s.png", {font:"neon", src:"Neon.ttf"}]);
+	frameTop.on("complete", function() {
+		var logo = frameTop.asset("icon_s.png")
+			.pos(20, 20, stage)
+			.alp(.6)
+			.cur() // give it a cursor defaults to pointer
+		logo.on("mousedown", function(e){stage.nextStage = null;}); // attempt to stop mousedown from going through
+		logo.on("click", function(){zgo("http://zimjs.com");});
+		stage.on("stagemouseup", function(){stage.nextStage = frame.stage;});
+
+		stage.update();
+	});
+});
+
+
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+</head>
+
+<body>
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+<script>
+var r=Math.round(Math.random()*1000000);
+document.write('<img src=/cgi-bin/traffic_plus?company=danzen&page=zimDrawing&r='+r+' width=1 height=1>');
+</script>
+</body>
+</html>
+
