@@ -10,7 +10,7 @@
 <!-- ZIM is free to use. You can donate to help improve ZIM at http://zimjs.com/donate 	-->
 
 <script src="https://d309knd7es5f10.cloudfront.net/createjs_1.1_min.js"></script>
-<script src="https://d309knd7es5f10.cloudfront.net/zim_9.2.1.js"></script>
+<script src="https://d309knd7es5f10.cloudfront.net/zim_9.3.0.js"></script>
 <!-- use zimjs.com/distill for minified individual functions! -->
 
 <script>
@@ -92,31 +92,19 @@ frame.on("ready", function() {
           trail.mouseChildren = false;
     });
   
-  var pen = new Pen({color: white, penType: "line", damp: 1}).center().top();
+  var pen = new Pen({color: white, penType: "line", damp: 1}).center().top().alp(.5);
   
   var draw = new MotionController({
       target: pen, 
       type: "pressmove",
-      speed:1000
+      speed:2000
   });
 
-  var line = pen.getChildAt(pen.paper.numChildren-1);
-
-  // stage.on("stagemouseup", function(){
-  //   pen.paper.animate({
-  //           props:{alpha:0},
-  //           time:300,
-  //           call: function(target){target.clear();
-  //           }
-  //         });
-  // });
-
   pen.on("stop", function(){
-    zog(line);
-    line.animate({
+    pen.lastSegment.animate({
             props:{alpha:0},
-            time:300,
-            call: function(target){target.clear();
+            time:200,
+            call: function(target){target.removeFrom();
             }
       });
   });
