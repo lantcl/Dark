@@ -100,13 +100,25 @@ frame.on("ready", function() {
       speed:1000
   });
 
-  stage.on("stagemouseup", function(){
-    pen.animate({
+  var line = pen.getChildAt(pen.paper.numChildren-1);
+
+  // stage.on("stagemouseup", function(){
+  //   pen.paper.animate({
+  //           props:{alpha:0},
+  //           time:300,
+  //           call: function(target){target.clear();
+  //           }
+  //         });
+  // });
+
+  pen.on("stop", function(){
+    zog(line);
+    line.animate({
             props:{alpha:0},
-            time:500,
+            time:300,
             call: function(target){target.clear();
             }
-          });
+      });
   });
 
     stage.update();
