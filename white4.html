@@ -102,7 +102,7 @@ frame.on("ready", function() {
           trail.mouseChildren = false;
     });
   
-  var pen = new Pen({color: white, penType: "line", damp: .8}).center().top();
+  var pen = new Pen({color: white, penType: "line", damp: .8, draggable: false}).center().top();
   pen.paper.alp(.4);
   
   var draw = new MotionController({
