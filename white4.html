@@ -29,10 +29,11 @@ var width = 1024;
 var height = 768;
 var color = black; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["On_Transience.mp3"];
-var path = "assets/";
+// var assets = ["On_Transience.mp3"];
+// var path = "assets/";
 
-var frame = new Frame(scaling, width, height, color, outerColor, assets, path);
+//var frame = new Frame(scaling, width, height, color, outerColor, assets, path);
+var frame = new Frame(scaling, width, height, color, outerColor);
 frame.on("ready", function() {
     zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
 
@@ -44,12 +45,14 @@ frame.on("ready", function() {
     // see http://zimjs.com/docs.html for documentation
     // see http://zimjs.com/bits.html for 64 Interactive Media techniques
 
-  var sound = new Rectangle(20, 20, "white").pos(10, 10);
+  // var sound = new Rectangle(20, 20, "white").pos(10, 10);
 
-  sound.on("click", function(){
-    frame.asset("On_Transience.mp3").play();
-  });
+  // sound.on("click", function(){
+  //   frame.asset("On_Transience.mp3").play();
+  // });
   
+//*******************cursor*******************
+
   document.body.style.cursor = "none";
 
   var cursorlight = new Container().center();
@@ -120,6 +123,27 @@ frame.on("ready", function() {
             }
       });
   });
+
+//******************game*******************
+
+    // function makecircle(e){
+    //     var circle = new Circle(20, "white").pos({x: rand(20, stageW-30), y: rand(20, stageH-30)});
+    //     //new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
+    //     //zog("made");
+    //     return circle;
+    // }
+
+    // interval({min:1000, max:3000}, function(){
+    //     makecircle();
+    //     stage.update();
+    // });  
+ var circle = new Circle(20, "white").pos({x: rand(20, stageW-30), y: rand(20, stageH-30)});
+
+      if (circle.hitTestBounds(pen.lastSegment)){
+        zog("hit");
+      // circle.removeFrom();
+      // stage.update();
+    }
 
     stage.update();
 
