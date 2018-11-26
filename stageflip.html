@@ -25,7 +25,7 @@
 var scaling = "fit"; // this will resize to fit inside the screen dimensions
 var width = 1024;
 var height = 768;
-var color = black; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
+var color = dark; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
 
 var frame = new Frame(scaling, width, height, color, outerColor);
@@ -43,6 +43,9 @@ frame.on("ready", function() {
     var holder = new Container(1850, 1850).centerReg();
     var white = new Rectangle(1850, 1850, "white").centerReg(holder);
     var black = new Rectangle(925, 1850, black).addTo(holder);  
+
+    // var leftcontainer = new Container(stageW/2, stageH).sca(-1, 1).pos().outline();
+    // var rightcontainer = new Container(stageW/2, stageH).pos(stageW/2).outline();
 
     var topflip = function(){
       holder.animate({
@@ -65,10 +68,18 @@ frame.on("ready", function() {
     //   });
     // }
 
+    function makecircle(){
+        new Circle(20, "white").pos({x: rand(20, stageW-20), y: rand(20, stageH-20)});
+        new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
+        //zog("made");
+    }
 
+    interval({min:1000, max:3000}, function(){
+        makecircle();
+        stage.update();
+    });     
 
-
-    stage.on("click", diagflip);
+    //stage.on("click", diagflip);
     //stage.on("click", topflip);
 
     stage.update(); // this is needed to show any changes
