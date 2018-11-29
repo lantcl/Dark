@@ -105,7 +105,7 @@ frame.on("ready", function() {
           trail.mouseChildren = false;
     });
   
-  var pen = new Pen({color: white, penType: "line", damp: .8, draggable: false}).center().top();
+  var pen = new Pen({color: white, penType: "line", damp: .8, draggable: false, size: 10, end:"round"}).center().top();
   pen.paper.alp(.4);
   
   var draw = new MotionController({
@@ -126,24 +126,33 @@ frame.on("ready", function() {
 
 //******************game*******************
 
-    // function makecircle(e){
-    //     var circle = new Circle(20, "white").pos({x: rand(20, stageW-30), y: rand(20, stageH-30)});
-    //     //new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
-    //     //zog("made");
-    //     return circle;
-    // }
+  var circlePapa = new Container().center();
 
-    // interval({min:1000, max:3000}, function(){
-    //     makecircle();
-    //     stage.update();
-    // });  
- var circle = new Circle(20, "white").pos({x: rand(20, stageW-30), y: rand(20, stageH-30)});
-
-      if (circle.hitTestBounds(pen.lastSegment)){
-        zog("hit");
-      // circle.removeFrom();
-      // stage.update();
+  var circle;
+    function makecircle(e){
+        circle = new Circle(20, "white").pos({x: rand(20, stageW-30), y: rand(20, stageH-30)}).addTo(circlePapa);
+        //new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
+        //zog("made");
     }
+
+    interval({min:3000, max:6000}, function(){
+        makecircle();
+    });  
+  
+  // var circle = new Circle(20, "white").pos({x: rand(20, stageW-30), y: rand(20, stageH-30)});
+  
+  pen.on("drawing", function () {
+    circlePapa.loop(function(circle){
+      if (pen.paper.hitTestCircle(circle, 15)){
+          circle.removeFrom();
+      }
+    }, true) //loops backwards through the array so the index numbers don't get mixed up for the removing 
+  });
+
+
+  
+
+  
 
     stage.update();
 
