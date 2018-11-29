@@ -50,7 +50,26 @@ frame.on("ready", function() {
   // sound.on("click", function(){
   //   frame.asset("On_Transience.mp3").play();
   // });
-  
+
+
+//******************background*******************
+
+
+  var holder = new Container(1850, 1850).centerReg().bot();
+  var white = new Rectangle(1850, 1850, "white").centerReg(holder);
+  var black = new Rectangle(925, 1850, black).addTo(holder);  
+
+  function topflip(){
+    holder.animate({
+      props:{rotation:"270"},
+      time: 1000
+    });
+  }
+
+  interval({min:1000, max:5000}, function(){
+        topflip();
+    }); 
+
 //*******************cursor*******************
 
   document.body.style.cursor = "none";
@@ -120,9 +139,11 @@ frame.on("ready", function() {
             props:{alpha:0},
             time:200,
             call: function(target){target.removeFrom();
-            }
+            }  
       });
   });
+
+
 
 //******************game*******************
 
@@ -135,7 +156,7 @@ frame.on("ready", function() {
         //zog("made");
     }
 
-    interval({min:100, max:1000}, function(){
+    interval({min:200, max:1000}, function(){
         makecircle();
     });  
   
@@ -149,10 +170,6 @@ frame.on("ready", function() {
     }, true) //loops backwards through the array so the index numbers don't get mixed up for the removing 
   });
 
-
-  
-
-  
 
     stage.update();
 
