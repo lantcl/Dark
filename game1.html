@@ -29,7 +29,7 @@ var width = 1024;
 var height = 768;
 var color = "black"; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["On_Transience.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "gameover.png", "logo.png", "play.png", "playagain.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "tagline.png"];
+var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "gameover.png", "logo.png", "play.png", "playagain.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fireball.mp3", "comet.mp3"];
 var path = "assets/";
 
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path);
@@ -45,11 +45,7 @@ frame.on("ready", function() {
     // see http://zimjs.com/docs.html for documentation
     // see http://zimjs.com/bits.html for 64 Interactive Media techniques
 
-  // var sound = new Rectangle(20, 20, "white").pos(10, 10);
-
-  // sound.on("click", function(){
-  //   frame.asset("On_Transience.mp3").play();
-  // });
+  	var bgMusic = frame.asset("bensound-scifi.mp3");
 
  	var introContainer = new Container(stageW, stageH).centerReg();
 	var design1 = frame.asset("design1.png").sca(.5).addTo(introContainer).mov(300, -50).alp(0);
@@ -92,10 +88,17 @@ frame.on("ready", function() {
 		rollColor: "black",
 		backgroundColor:"limegreen",
 		rollBackgroundColor:"lime",
-	}).centerReg(introContainer).mov(null, 150).sca(.9);		
+	}).centerReg(introContainer).mov(null, 150).sca(.9).alp(0);		
+
+	playButton.animate({
+		wait: 2000,
+		props: {alpha: 1},
+		time: 1000
+	});
 
 	playButton.on("click", function(){
 		makeGame();
+		bgMusic.play();
 	});
 
 function gamOver(){
@@ -110,6 +113,7 @@ function gamOver(){
 
 function makeGame(){
 	
+
 	introContainer.animate({
 		props:{y:-stageH},
 		time: 2000
@@ -127,6 +131,7 @@ function makeGame(){
 	var brainContainer = new Container(400, 400).centerReg().alp(0);//.outline();
 	var brain = frame.asset("brain1.png").sca(.2).centerReg(brainContainer);
 	var brain2 = frame.asset("brain2.png").sca(.2).centerReg(brainContainer);
+	var grey = frame.asset("greybrain.png").sca(.2).centerReg(brainContainer).alp(0);
 	brain2.animate({
 		props: {alpha: 0},
 		loop: true,
@@ -138,6 +143,7 @@ function makeGame(){
 	var life3 = frame.asset("heart2.png").centerReg(lifeContainer).sca(.2).mov(80);
 	
 	brainContainer.animate({
+		wait: 500,
 		time: 4000,
 		props: {alpha: 1},
 	});
@@ -252,28 +258,27 @@ function makeGame(){
 
 //******************game*******************
 
-  // var circlePapa = new Container().center();
+  var circlePapa = new Container().centerReg();
 
-  // var circle;
-  //   function makecircle(e){
-  //       circle = new Circle(20, "white").pos({x: rand(20, stageW-50), y: rand(20, stageH-50)}).addTo(circlePapa);
-  //       //new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
-  //       //zog("made");
-  //   }
+  var bot;
 
-  //   interval({min:500, max:1000}, function(){
-  //       makecircle();
-  //   });  
+    function makeBot(e){
+        bot = frame.asset("greybot.png").sca(.2).pos({x: rand(20, stageW-50), y: rand(20, stageH-50)}).addTo(circlePapa);
+        //new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
+        //zog("made");
+    }
+
+    interval({min:500, max:1000}, function(){
+        makeBot();
+    });  
   
-  // var circle = new Circle(20, "white").pos({x: rand(20, stageW-30), y: rand(20, stageH-30)});
-  
-  pen.on("drawing", function () {
-    circlePapa.loop(function(circle){
-      if (pen.paper.hitTestCircle(circle, 15)){
-          circle.removeFrom();
-      }
-    }, true) //loops backwards through the array so the index numbers don't get mixed up for the removing 
-  });
+  // pen.on("drawing", function () {
+  //   circlePapa.loop(function(bot){
+  //     if (pen.paper.hitTestBounds(bot, 15)){
+  //         bot.removeFrom();
+  //     }
+  //   }, true) //loops backwards through the array so the index numbers don't get mixed up for the removing 
+  // });
 
 
     stage.update();
