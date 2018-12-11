@@ -29,7 +29,7 @@ var width = 1024;
 var height = 768;
 var color = "black"; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["On_Transience.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "gameover.png", "logo.png", "play.png", "playagain.png", "win.png", "whitebot.png", "heart.png", "greybot.png", "tagline.png"];
+var assets = ["On_Transience.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "gameover.png", "logo.png", "play.png", "playagain.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "tagline.png"];
 var path = "assets/";
 
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path);
@@ -53,7 +53,7 @@ frame.on("ready", function() {
 
  	var introContainer = new Container(stageW, stageH).centerReg();
 	var design1 = frame.asset("design1.png").sca(.5).addTo(introContainer).mov(300, -50).alp(0);
-	var tagline = frame.asset("tagline.png").sca(.3).centerReg(introContainer).mov(null, 200).alp(0);
+	var tagline = frame.asset("tagline.png").sca(.3).centerReg(introContainer).mov(null, 250).alp(0);
 	var logo = frame.asset("logo.png").sca(.45).centerReg(introContainer).mov(null, -100).alp(.4);
 	
 
@@ -115,16 +115,16 @@ function makeGame(){
 		time: 2000
 	});
 
-	var heart = frame.asset("heart.png").sca(.3).centerReg(gameContainer).mov(null, 200).alp(.5);
-	var gameContainer = new Container();
-
+	var gameContainer = new Container().center();
+	var lifeContainer = new Container(400,90).centerReg(gameContainer).mov(null, 320);
+	
 	var bg = frame.asset("bg.png").sca(.6).centerReg().bot().alp(0);
-	bg.animate({
-		props: {alpha: 1},
-		time: 1000
-	});
+		bg.animate({
+			props: {alpha: 1},
+			time: 1000
+		});
 
-	var brainContainer = new Container(400, 400).centerReg();//.outline();
+	var brainContainer = new Container(400, 400).centerReg().alp(0);//.outline();
 	var brain = frame.asset("brain1.png").sca(.2).centerReg(brainContainer);
 	var brain2 = frame.asset("brain2.png").sca(.2).centerReg(brainContainer);
 	brain2.animate({
@@ -133,7 +133,47 @@ function makeGame(){
 		rewind: true
 	});
 
+	var life1 = frame.asset("heart3.png").centerReg(lifeContainer).sca(.2).mov(-80);
+	var life2 = frame.asset("heart1.png").centerReg(lifeContainer).sca(.2);
+	var life3 = frame.asset("heart2.png").centerReg(lifeContainer).sca(.2).mov(80);
+	
+	brainContainer.animate({
+		time: 4000,
+		props: {alpha: 1},
+	});
 
+	life1.animate({
+		time: 500,
+		props: {y: 200},
+		from: true,
+		ease: "backInOut"
+	});
+	life2.animate({
+		wait: 300,
+		time: 500,
+		props: {y: 200},
+		from: true,
+		ease: "backInOut"
+	});
+	life3.animate({
+		wait: 600,
+		time: 500,
+		props: {y: 200},
+		from: true,
+		ease: "backInOut"
+	});
+	// var lives = ["life1", "life2", "life3"];
+	// var life;
+	// for(var i=0; i<lives.length; i++){
+	// 	life = lives[i];
+	// 	//zog(life);
+	// 	life1.animate({
+	// 		time: 1000,
+	// 		props: {y: -50}
+	// 	});
+	// }
+	
+	
 }
 //*******************cursor*******************
 
