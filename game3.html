@@ -29,7 +29,7 @@ var width = 1024;
 var height = 768;
 var color = "black"; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "design2.png", "gameover.png", "logo.png", "play.png", "playagain.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "greybot2.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fireball.mp3", "comet.mp3", "tech-heart.png"];
+var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "design2.png", "gameover.png", "logo.png", "play.png", "playagain.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "greybot2.png", "geo.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fireball.mp3", "fizzle.mp3", "tech-heart.png"];
 var path = "assets/";
 
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path);
@@ -48,7 +48,16 @@ frame.on("ready", function() {
 	var bgMusic = frame.asset("bensound-scifi.mp3");
 	var laser = frame.asset("laser.mp3");
 	var stutter = frame.asset("stutter.mp3");
-	
+	var blip = frame.asset("blip.mp3");
+
+	var brain;
+	var brain2;
+	var brainContainer;
+	var greybrain;
+	var life1;
+	var life2;
+	var life3;
+
 	var introContainer = new Container(stageW, stageH).centerReg();
 	
 	var bg = frame.asset("bg.png").sca(.6).centerReg().bot().alp(0);
@@ -110,7 +119,7 @@ function gameIntro(){
 
 }
 
-gameIntro();
+//gameIntro();
 
 //*******************losegame*******************
 	function gameOver(){
@@ -225,10 +234,10 @@ function makeGame(){
 	});
 
 //*******************brain*******************
-	var brainContainer = new Container(400, 400).centerReg().alp(0);//.outline();
-	var brain = frame.asset("brain1.png").sca(.2).centerReg(brainContainer);
-	var brain2 = frame.asset("brain2.png").sca(.2).centerReg(brainContainer);
-	var grey = frame.asset("greybrain.png").sca(.2).centerReg(brainContainer).alp(0);
+	brainContainer = new Container(400, 400).centerReg().alp(0);//.outline();
+	brain = frame.asset("brain1.png").sca(.2).centerReg(brainContainer);
+	brain2 = frame.asset("brain2.png").sca(.2).centerReg(brainContainer);
+	greybrain = frame.asset("braingrey.png").sca(.2).centerReg(brainContainer).alp(0);
 	
 	brain2.animate({
 		props: {alpha: 0},
@@ -236,9 +245,9 @@ function makeGame(){
 		rewind: true
 	});
 
-	var life1 = frame.asset("heart3.png").centerReg(lifeContainer).sca(.15).mov(-80);
-	var life2 = frame.asset("heart1.png").centerReg(lifeContainer).sca(.15);
-	var life3 = frame.asset("heart2.png").centerReg(lifeContainer).sca(.15).mov(80);
+	life1 = frame.asset("heart3.png").centerReg(lifeContainer).sca(.15).mov(-80);
+	life2 = frame.asset("heart1.png").centerReg(lifeContainer).sca(.15);
+	life3 = frame.asset("heart2.png").centerReg(lifeContainer).sca(.15).mov(80);
 	
 	brainContainer.animate({
 		wait: 500,
@@ -278,6 +287,8 @@ function makeGame(){
 	// }	
 	
 }
+
+makeGame();
 
 //*******************cursor*******************
 
@@ -356,19 +367,40 @@ function makeGame(){
 
 //******************game*******************
 
-  // var circlePapa = new Container(stageW, stageH).center();
+  var circlePapa = new Container(stageW, stageH).center();
 
-  // var bot;
+  	var bot;
+  	var geo;
+  	var position;
 
-  //   function makeBot(e){
-  //       bot = frame.asset("greybot.png").sca(.2).pos({x: rand(20, stageW-50), y: rand(20, stageH-50)}).addTo(circlePapa);
-  //       //new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
-  //       //zog("made");
-  //   }
+	var startingPositions = [[stageW+50,stageH+50],[stageW+50,-50],[-50,-50],[-50,stageH+50],[-50,stageH/2],[stageW,stageH/2],[stageW/2,stageH],[stageW/2,0]];
+  	
+  	function placeBot(){
+  	position = shuffle(startingPositions)[0];
+  	}
 
-  //   interval({min:100, max:3000}, function(){
-  //       makeBot();
-  //   });  
+    function makeBot(e){
+    	placeBot();
+    	bot = frame.asset("greybot.png").clone().centerReg().sca(.2).pos(position[0], position[1]).addTo(circlePapa);
+		bot.animate({
+		  	props: {rotation: 360, x:stageW/2, y:stageH/2},
+		  	time: 10000
+		});
+    }
+
+    function makeGeo(e){
+        geo = frame.asset("geo.png").clone().sca(.2).pos(position[0], position[1]).addTo(circlePapa);
+        blip.play();
+    }
+
+    var bots = interval({min:100, max:3000}, function(){
+        makeBot();
+    });  
+
+    var geo = interval({min:300, max:6000}, function(){
+        makeGeo();
+    }); 
+
   
   // pen.on("drawing", function () {
   //   circlePapa.loop(function(bot){
@@ -377,6 +409,38 @@ function makeGame(){
   //     }
   //   }, true) //loops backwards through the array so the index numbers don't get mixed up for the removing 
   // });
+
+  
+
+	function hit(){
+		laser.play();
+		greybrain.animate({
+			props: {alpha: 1, scale: .21},
+			time: 200,
+			loopWait: 500, 
+			rewind: true	
+		});
+	}
+
+	var dot = new Circle(30, pink).pos(100,100).drag();
+	
+	dot.on("pressmove", function () {
+	    circlePapa.loop(function(bot){
+			if (bot.hitTestBounds(brainContainer)){
+				bot.removeFrom();
+				zog("hit");
+			 	hit();
+		    }
+	    }, true)
+		circlePapa.loop(function(geo){
+			if (geo.hitTestBounds(brainContainer)){
+				geo.removeFrom();
+			 	zog("hit bad");
+			 	hit();
+				}
+		}, true)
+
+	});
 
 
     stage.update();
