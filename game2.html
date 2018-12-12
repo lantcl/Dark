@@ -29,7 +29,7 @@ var width = 1024;
 var height = 768;
 var color = "black"; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "design2.png", "gameover.png", "logo.png", "play.png", "playagain.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "greybot2.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fireball.mp3", "comet.mp3"];
+var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "design2.png", "gameover.png", "logo.png", "play.png", "playagain.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "greybot2.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fireball.mp3", "comet.mp3", "tech-heart.png"];
 var path = "assets/";
 
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path);
@@ -48,64 +48,64 @@ frame.on("ready", function() {
 	var bgMusic = frame.asset("bensound-scifi.mp3");
 	var bg = frame.asset("bg.png").sca(.6).centerReg().bot().alp(0);
 
- // var introContainer = new Container(stageW, stageH).centerReg();
-	// var design1 = frame.asset("design1.png").sca(.5).addTo(introContainer).mov(300, -50).alp(0);
-	// var tagline = frame.asset("tagline.png").sca(.3).centerReg(introContainer).mov(null, 250).alp(0);
-	// var logo = frame.asset("logo.png").sca(.45).centerReg(introContainer).mov(null, -100).alp(.4);
-	
+function gameIntro(){
 
+ 	var introContainer = new Container(stageW, stageH).centerReg();
+	var design1 = frame.asset("design1.png").sca(.5).addTo(introContainer).mov(300, -50).alp(0);
+	var tagline = frame.asset("tagline.png").sca(.3).centerReg(introContainer).mov(null, 250).alp(0);
+	var logo = frame.asset("logo.png").sca(.45).centerReg(introContainer).mov(null, -100).alp(.4);
 
-	// logo.animate({
-	// 	props: {scale: .5},
-	// 	time: 3000,
-	// 	call: logoGlow()
-	// });
+	logo.animate({
+		props: {scale: .5},
+		time: 3000,
+		call: logoGlow()
+	});
 
-	// function logoGlow(){
-	// 	logo.animate({
-	// 		props: {alpha: 1},
-	// 		time: 1000,
-	// 		rewind: true,
-	// 		loop: true
-	// 	});
-	// 	tagline.animate({
-	// 		props: {alpha: 1, y:700},
-	// 		time: 3000
-	// 	});
+	function logoGlow(){
+		logo.animate({
+			props: {alpha: 1},
+			time: 1000,
+			rewind: true,
+			loop: true
+		});
+		tagline.animate({
+			props: {alpha: 1, y:700},
+			time: 3000
+		});
 
-	// 	design1.animate({
-	// 		props: {alpha: .1},
-	// 		time: 3000,
+		design1.animate({
+			props: {alpha: .1},
+			time: 3000,
 			
-	// 	});
-	// }
+		});
+	}
 
-	// var playButton = new Button({
-	// 	label: "enter",
-	// 	width: 150,
-	// 	height: 50,
-	// 	corner: 0,
-	// 	color: "black",
-	// 	rollColor: "black",
-	// 	backgroundColor:"limegreen",
-	// 	rollBackgroundColor:"lime",
-	// }).centerReg(introContainer).mov(null, 150).sca(.9).alp(0);		
+	var playButton = new Button({
+		label: "enter",
+		width: 150,
+		height: 50,
+		corner: 0,
+		color: "black",
+		rollColor: "black",
+		backgroundColor:"limegreen",
+		rollBackgroundColor:"lime",
+	}).centerReg(introContainer).mov(null, 150).sca(.9).alp(0);		
 
-	// playButton.animate({
-	// 	wait: 2000,
-	// 	props: {alpha: 1},
-	// 	time: 1000
-	// });
+	playButton.animate({
+		wait: 2000,
+		props: {alpha: 1},
+		time: 1000
+	});
 
-	// playButton.on("click", function(){
-	// 	makeGame();
-	// 	bgMusic.play();
-	// });
+	playButton.on("click", function(){
+		makeGame();
+		bgMusic.play();
+	});
 
-
+}
 
 //*******************losegame*******************
-function gameOver(){
+	function gameOver(){
 
 	bg.animate({
 		props: {alpha: 0},
@@ -154,7 +154,7 @@ function gameOver(){
 	}
 }
 
-	// gameOver();
+	//gameOver();
 
 
 //*******************wingame*******************
@@ -165,32 +165,12 @@ function winGame(){
 		time: 1000
 	});
 	
-	var gameOverContainer = new Container(stageW, stageH).centerReg();
-	var successLogo = frame.asset("success.png").sca(.35).centerReg(gameOverContainer).mov(null, -100).alp(.4);;
-	var design2 = frame.asset("design2.png").sca(.5).addTo(gameOverContainer).mov(-30, 100).alp(.1);
-	var botGloat = frame.asset("greybot2.png").sca(.35).centerReg(gameOverContainer).pos(116, 541).alp(.2);
+	var winContainer = new Container(stageW, stageH).centerReg();
+	var successLogo = frame.asset("win.png").sca(.35).centerReg(winContainer).mov(null, -100).alp(.4);
+	var design2 = frame.asset("design2.png").sca(.5).addTo(winContainer).alp(.1).mov(-50, -200);
+	var techHeart = frame.asset("tech-heart.png").sca(.3).centerReg(winContainer).alp(.2).mov(null, 100);
 	
-	var playButton = new Button({
-		label: "retry",
-		width: 150,
-		height: 50,
-		corner: 0,
-		color: "black",
-		rollColor: "black",
-		backgroundColor:"darkslategray",
-		rollBackgroundColor:"lime",
-	}).centerReg(gameOverContainer).mov(null, 100).sca(.9).alp(0);		
 
-	playButton.animate({
-		wait: 2000,
-		props: {alpha: 1},
-		time: 1000
-	});
-
-	playButton.on("click", function(){
-		makeGame();
-		bgMusic.play();
-	});
 	successLogo.animate({
 		props: {scale: .4},
 		time: 3000,
@@ -204,10 +184,16 @@ function winGame(){
 			rewind: true,
 			loop: true
 		});
+		techHeart.animate({
+			props: {alpha: .5},
+			time: 1000,
+			rewind: true,
+			loop: true
+		});
 	}
 }
 
-	// winGame();
+	winGame();
 
 
 
@@ -361,19 +347,19 @@ function makeGame(){
 
 //******************game*******************
 
-  var circlePapa = new Container().centerReg();
+  // var circlePapa = new Container(stageW, stageH).center();
 
-  var bot;
+  // var bot;
 
-    function makeBot(e){
-        bot = frame.asset("greybot.png").sca(.2).pos({x: rand(20, stageW-50), y: rand(20, stageH-50)}).addTo(circlePapa);
-        //new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
-        //zog("made");
-    }
+  //   function makeBot(e){
+  //       bot = frame.asset("greybot.png").sca(.2).pos({x: rand(20, stageW-50), y: rand(20, stageH-50)}).addTo(circlePapa);
+  //       //new Circle(20).pos({x: rand(20, stageW-20), y: rand(stageH-20)});
+  //       //zog("made");
+  //   }
 
-    interval({min:500, max:1000}, function(){
-        makeBot();
-    });  
+  //   interval({min:100, max:3000}, function(){
+  //       makeBot();
+  //   });  
   
   // pen.on("drawing", function () {
   //   circlePapa.loop(function(bot){
