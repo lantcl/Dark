@@ -213,9 +213,9 @@ function winGame(){
 	});
 	
 	var winContainer = new Container(stageW, stageH).centerReg();
-	var successLogo = frame.asset("win.png").sca(.35).centerReg(winContainer).mov(null, -100).alp(.35);
+	var successLogo = frame.asset("win.png").sca(.35).centerReg(winContainer).mov(null, -50).alp(.35);
 	var design2 = frame.asset("design2.png").sca(.5).addTo(winContainer).alp(.1).mov(null, 100);
-	var techHeart = frame.asset("tech-heart.png").sca(.3).centerReg(winContainer).alp(.2).mov(null, 100);
+	
 	
 	var playButton = new Button({
 		label: "revert",
@@ -224,16 +224,22 @@ function winGame(){
 		corner: 0,
 		color: "black",
 		rollColor: "black",
-		backgroundColor:"darkslategray",
+		backgroundColor:"limegreen",
 		rollBackgroundColor:"lime",
 	}).centerReg(winContainer).mov(null, 100).sca(.9).alp(0);		
-
+	
+	var techHeart = frame.asset("tech-heart.png").sca(.14).centerReg(winContainer).alp(.1).mov(-317, 213);
+	
 	playButton.animate({
 		wait: 2000,
 		props: {alpha: 1},
 		time: 1000
 	});
 
+	playButton.on("click", function(){
+		zgo("http://lantc.dev.fast.sheridanc.on.ca/sentinel/game6.html");
+	});
+	
 	successLogo.animate({
 		props: {scale: .4},
 		time: 3000,
@@ -248,7 +254,7 @@ function winGame(){
 			loop: true
 		});
 		techHeart.animate({
-			props: {alpha: .5},
+			props: {alpha: .3},
 			time: 1000,
 			rewind: true,
 			loop: true
