@@ -33,7 +33,7 @@ var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to us
 var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "design2.png", "gameover.png", "logo.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "greybot2.png", "geo.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fizzle.mp3", "tech-heart.png", "heart3grey.png", "heart2grey.png", "heart1grey.png", "tryagain.png", "protect.png"];
 var path = "assets/";
 
-var frame = new Frame(scaling, width, height, color, outerColor, assets, path);
+var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter({corner:0, backgroundColor:"black", foregroundColor: "lime"}));
 //var frame = new Frame(scaling, width, height, color, outerColor);
 frame.on("ready", function() {
     zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
@@ -70,6 +70,8 @@ frame.on("ready", function() {
 	var introContainer = new Container(stageW, stageH).centerReg();
 	
 	var bg = frame.asset("bg.png").sca(.6).centerReg().bot().alp(0);
+
+	var timeOut;
 
 function gameIntro(){
 
@@ -122,8 +124,10 @@ function gameIntro(){
 
 	playButton.on("click", function(){
 		makeGame();
+		blip.play({volume: .5});
 		stutter.play();
 		bgMusic.play();
+		timeOut.pause(false);
 	});
 
 }
@@ -133,8 +137,9 @@ gameIntro();
 //*******************losegame*******************
 	function lost(){
 	gameOverContainer.animate({
-		props:{y:370},
+		props:{y:stageH, alpha:0},
 		time: 2000,
+		from:true
 	});
 
 	bg.animate({
@@ -147,14 +152,15 @@ gameIntro();
 
 	function gameOver(){
 	
-	
+	timeOut.pause(true);
+
 	stutter.play();
 
-	gameOverContainer = new Container(stageW, stageH).centerReg();
+	gameOverContainer = new Container(stageW, stageH).centerReg().alp(1);
 	var gameOverLogo = frame.asset("gameover.png").sca(.35).centerReg(gameOverContainer).mov(null, -100).alp(.4);;
-	design2 = frame.asset("design2.png").sca(.5).addTo(gameOverContainer).mov(-30, 100).alp(.1);
+	design2 = frame.asset("design2.png").sca(.5).addTo(gameOverContainer).mov(-30, 60).alp(.1);
 	var tryagain = frame.asset("tryagain.png").sca(.3).centerReg(gameOverContainer).mov(null, 100).alp(.9);
-	var botGloat = frame.asset("greybot2.png").sca(.35).centerReg(gameOverContainer).pos(116, 541).alp(.2);
+	var botGloat = frame.asset("greybot2.png").sca(.35).centerReg(gameOverContainer).pos(116, 500).alp(.2);
 	
 	var playButton = new Button({
 		label: "try again",
@@ -174,12 +180,7 @@ gameIntro();
 	});
 
 	playButton.on("click", function(){
-		makeGame();
-		// bgMusic.play();
-		gameOverContainer.animate({
-		props:{y:-450},
-		time: 1000
-		});
+		zgo("http://lantc.dev.fast.sheridanc.on.ca/sentinel/game6.html");
 	});
 	gameOverLogo.animate({
 		props: {scale: .4},
@@ -202,7 +203,9 @@ gameIntro();
 
 //*******************wingame*******************
 function winGame(){
-
+	
+	stutter.play();
+	timeOut.pause(true);
 	
 	bg.animate({
 		props: {alpha: 0},
@@ -453,18 +456,17 @@ function makeGame(){
 
     function makeGeo(e){
         geo = frame.asset("geo.png").clone().sca(.2).pos(position[0], position[1]).addTo(circlePapa);
-        blip.play({volume: .5});
         geo.animate({
 		  	props: {rotation: 600, x:stageW/2, y:stageH/2},
 		  	time: 5000
 		});
     }
 
-    bots = interval({min:1000, max:2000}, function(){
+    var bots = interval({min:1000, max:2000}, function(){
         makeBot();
     });  
 
-    geo = interval({min:5000, max:8000}, function(){
+    var geos = interval({min:5000, max:8000}, function(){
         makeGeo();
     }); 
 
@@ -548,16 +550,28 @@ function makeGame(){
 
 	});
 
-	timeout(25000, function(){
-		bots = interval({min:800, max:100}, function(){
-        	makeBot();
-    	});  
+	// timeout(25000, function(){
+	// 	bots = interval({min:800, max:100}, function(){
+ //        	makeBot();
+ //    	});  
 
-    	geo = interval({min:4000, max:6000}, function(){
-        	makeGeo();
-    	}); 
+ //    	geo = interval({min:4000, max:6000}, function(){
+ //        	makeGeo();
+ //    	}); 
+	// });
+	// function stopBots(){
+	// 	bots.pause(true);
+	// 	geo.pause(true);
+	// }
+	timeOut = timeout(20000, function() {
+		if(life1.alpha == 0){
+		bots.pause(true);
+		geos.pause(true);
+		theGame.removeAllChildren();
+		winGame();
+		stage.update();
+		}
 	});
-
 
 }
 	
