@@ -1,0 +1,657 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Sentinel</title>
+
+<!-- Welcome to ZIM at https://zimjs.com - Code Creativity!              	        -->
+<!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS https://createjs.com -->
+<!-- Founded by Inventor Dan Zen - http://danzen.com - Canadian New Media Award Winner 	-->
+<!-- ZIM is free to use. You can donate to help improve ZIM at http://zimjs.com/donate 	-->
+
+<!--************Project created Cleo Lant and Dan Zen*******************-->
+<!-- <script>zon = false;</script> -->
+<script src="https://d309knd7es5f10.cloudfront.net/createjs_1.1.js"></script>
+<!-- <script src="https://d309knd7es5f10.cloudfront.net/createjs_1.1_min.js"></script> -->
+<script src="https://d309knd7es5f10.cloudfront.net/zim_9.4.0.js"></script>
+<!-- use zimjs.com/distill for minified individual functions! -->
+
+<script>
+
+// SCALING OPTIONS
+// scaling can have values as follows with full being the default
+// "fit"	sets canvas and stage to dimensions and scales to fit inside window size
+// "outside"	sets canvas and stage to dimensions and scales to fit outside window size
+// "full"	sets stage to window size with no scaling
+// "tagID"	add canvas to HTML tag of ID - set to dimensions if provided - no scaling
+
+
+var scaling = "fit"; // this will resize to fit inside the screen dimensions
+var width = 1024;
+var height = 768;
+var color = "black"; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
+var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
+var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "design2.png", "gameover.png", "logo.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "greybot2.png", "geo.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fizzle.mp3", "tech-heart.png", "heart3grey.png", "heart2grey.png", "heart1grey.png", "tryagain.png", "protect.png", "virus.png"];
+var path = "assets/";
+
+var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter({corner:0, backgroundColor:"black", foregroundColor: "lime"}));
+//var frame = new Frame(scaling, width, height, color, outerColor);
+frame.on("ready", function() {
+    zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
+
+    var stage = frame.stage;
+    var stageW = frame.width;
+    var stageH = frame.height;
+
+    // see http://zimjs.com/learn.html for video and code tutorials
+    // see http://zimjs.com/docs.html for documentation
+    // see http://zimjs.com/bits.html for 64 Interactive Media techniques
+
+	var bgMusic = frame.asset("bensound-scifi.mp3");
+	var laser = frame.asset("laser.mp3");
+	var stutter = frame.asset("stutter.mp3");
+	var blip = frame.asset("blip.mp3");
+	var fizzle = frame.asset("fizzle.mp3");
+
+	var design2;
+	var brain;
+	var brain2;
+	var brainContainer;
+	var greybrain;
+	var lifeContainer;
+	var lifeContainer2;
+	var life1; 	var life1grey;
+	var life2;	var life2grey;
+	var life3;	var life3grey;
+	var count;
+	var virus;
+  	var bot; var bots;
+  	var geo;
+  	var position;
+  	var gameContainer;
+	var introContainer = new Container(stageW, stageH).centerReg();
+	
+	var bg = frame.asset("bg.png").sca(.6).centerReg().bot().alp(0);
+
+	var timeOut;
+
+function gameIntro(){
+
+ 	
+	var design1 = frame.asset("design1.png").sca(.5).addTo(introContainer).mov(300, -50).alp(0);
+	var tagline = frame.asset("tagline.png").sca(.3).centerReg(introContainer).mov(null, 250).alp(0);
+	var logo = frame.asset("logo.png").sca(.45).centerReg(introContainer).mov(null, -100).alp(.4);
+
+	logo.animate({
+		props: {scale: .5},
+		time: 3000,
+		call: logoGlow()
+	});
+
+	function logoGlow(){
+		logo.animate({
+			props: {alpha: 1},
+			time: 1000,
+			rewind: true,
+			loop: true
+		});
+		tagline.animate({
+			props: {alpha: 1, y:700},
+			time: 3000
+		});
+
+		design1.animate({
+			props: {alpha: .1},
+			time: 3000,
+			
+		});
+	}
+
+	var playButton = new Button({
+		label: "enter",
+		width: 150,
+		height: 50,
+		corner: 0,
+		color: "black",
+		rollColor: "black",
+		backgroundColor:"limegreen",
+		rollBackgroundColor:"lime",
+	}).centerReg(introContainer).mov(null, 150).sca(.9).alp(0);		
+
+	playButton.animate({
+		wait: 2000,
+		props: {alpha: 1},
+		time: 1000
+	});
+
+	playButton.on("click", function(){
+		makeGame();
+		blip.play({volume: .5});
+		stutter.play();
+		bgMusic.play();
+		timeOut.pause(false);
+	});
+
+}
+
+gameIntro();
+
+//*******************losegame*******************
+	function lost(){
+	gameOverContainer.animate({
+		props:{y:stageH, alpha:0},
+		time: 2000,
+		from:true
+	});
+
+	bg.animate({
+		props: {alpha: 0},
+		time: 1000,
+	});
+	
+	}
+
+
+	function gameOver(){
+	
+	introContainer.removeAllChildren();
+
+	stutter.play();
+	//createjs.Sound.stop()
+	gameOverContainer = new Container(stageW, stageH).centerReg().alp(1);
+	var gameOverLogo = frame.asset("gameover.png").sca(.35).centerReg(gameOverContainer).mov(null, -100).alp(.4);;
+	design2 = frame.asset("design2.png").sca(.5).addTo(gameOverContainer).mov(-30, 60).alp(.1);
+	var tryagain = frame.asset("tryagain.png").sca(.3).centerReg(gameOverContainer).mov(null, 100).alp(.9);
+	var botGloat = frame.asset("greybot2.png").sca(.35).centerReg(gameOverContainer).pos(116, 500).alp(.2);
+	
+	var playButton = new Button({
+		label: "try again",
+		width: 160,
+		height: 50,
+		corner: 0,
+		color: "black",
+		rollColor: "black",
+		backgroundColor:"darkslategray",
+		rollBackgroundColor:"lime",
+	}).centerReg(gameOverContainer).mov(null, 100).sca(.9).alp(0);		
+
+	playButton.animate({
+		wait: 2000,
+		props: {alpha: 1},
+		time: 1000
+	});
+
+	playButton.on("click", function(){
+		zgo("http://lantc.dev.fast.sheridanc.on.ca/sentinel/Sentinel.html");
+	});
+	gameOverLogo.animate({
+		props: {scale: .4},
+		time: 3000,
+		call: logoGlow()
+	});
+
+	function logoGlow(){
+		gameOverLogo.animate({
+			props: {alpha: 1},
+			time: 1000,
+			rewind: true,
+			loop: true
+		});
+	}
+}
+
+	//gameOver();
+
+
+//*******************wingame*******************
+function winGame(){
+	
+	stutter.play();
+	timeOut.pause(true);
+	
+	bg.animate({
+		props: {alpha: 0},
+		time: 1000
+	});
+	
+	var winContainer = new Container(stageW, stageH).centerReg();
+
+	winContainer.animate({
+		props:{y:stageH, alpha:0},
+		time: 2000,
+		from:true});
+
+	var successLogo = frame.asset("win.png").sca(.35).centerReg(winContainer).mov(null, -50).alp(.35);
+	var design2 = frame.asset("design2.png").sca(.5).addTo(winContainer).alp(.1).mov(null, 100);
+	
+	var playButton = new Button({
+		label: "revert",
+		width: 160,
+		height: 50,
+		corner: 0,
+		color: "black",
+		rollColor: "black",
+		backgroundColor:"limegreen",
+		rollBackgroundColor:"lime",
+	}).centerReg(winContainer).mov(null, 100).sca(.9).alp(0);		
+	
+	var techHeart = frame.asset("tech-heart.png").sca(.14).centerReg(winContainer).alp(.1).mov(-317, 213);
+	
+	playButton.animate({
+		wait: 2000,
+		props: {alpha: 1},
+		time: 1000
+	});
+
+	playButton.on("click", function(){
+		zgo("http://lantc.dev.fast.sheridanc.on.ca/sentinel/Sentinel.html");
+	});
+	
+	successLogo.animate({
+		props: {scale: .4},
+		time: 3000,
+		call: logoGlow()
+	});
+
+	function logoGlow(){
+		successLogo.animate({
+			props: {alpha: 1},
+			time: 1000,
+			rewind: true,
+			loop: true
+		});
+		techHeart.animate({
+			props: {alpha: .3},
+			time: 1000,
+			rewind: true,
+			loop: true
+		});
+	}
+}
+
+	//winGame();
+
+
+
+//*******************game*******************
+
+function makeGame(){	
+
+	bg.animate({
+		props: {alpha: 1},
+		time: 1000
+	});
+
+	var theGame = new Container(stageW, stageH).centerReg();
+
+	var protect = frame.asset("protect.png").sca(.3).centerReg(gameContainer).alp(0).mov(null,-350);
+	protect.animate({
+		props: {alpha: 1, y:90},
+		time: 3000,
+		call: function fade(){
+		protect.animate({
+			wait: 1000,
+			props:{alpha: 0},
+			time: 3000
+		});
+	}
+	});
+	
+
+	introContainer.animate({
+		props:{y:-stageH},
+		time: 2000
+	});
+
+	var gameContainer = new Container().center(theGame);
+	var lifeContainer = new Container(400,90).centerReg(gameContainer).mov(null, 320);
+	var lifeContainer2 = new Container(400,90).centerReg(gameContainer).bot().alp(0);
+
+	bg.animate({
+		props: {alpha: 1},
+		time: 1000
+	});
+
+//*******************brain*******************
+	
+	brainContainer = new Container(400, 400).centerReg(theGame).alp(0);//.outline();
+	brain = frame.asset("brain1.png").sca(.2).centerReg(brainContainer);
+	brain2 = frame.asset("brain2.png").sca(.2).centerReg(brainContainer);
+	greybrain = frame.asset("braingrey.png").sca(.2).centerReg(brainContainer).alp(0);
+	
+	brain2.animate({
+		props: {alpha: 0},
+		loop: true,
+		rewind: true
+	});
+
+
+	life1grey = frame.asset("heart3grey.png").centerReg(lifeContainer2).sca(.15).mov(-80);
+	life2grey = frame.asset("heart1grey.png").centerReg(lifeContainer2).sca(.15);
+	life3grey = frame.asset("heart2grey.png").centerReg(lifeContainer2).sca(.15).mov(80);
+	
+	life1 = frame.asset("heart3.png").centerReg(lifeContainer).sca(.15).mov(-80);
+	life2 = frame.asset("heart1.png").centerReg(lifeContainer).sca(.15);
+	life3 = frame.asset("heart2.png").centerReg(lifeContainer).sca(.15).mov(80);
+
+
+	lifeContainer2.animate({
+		wait: 1500,
+		time: 500,
+		props: {alpha: 1},
+	});
+
+	brainContainer.animate({
+		wait: 500,
+		time: 4000,
+		props: {alpha: 1},
+	});
+
+	life1.animate({
+		time: 500,
+		props: {y: 200},
+		from: true,
+		ease: "backInOut"
+	});
+	life2.animate({
+		wait: 300,
+		time: 500,
+		props: {y: 200},
+		from: true,
+		ease: "backInOut"
+	});
+	life3.animate({
+		wait: 600,
+		time: 500,
+		props: {y: 200},
+		from: true,
+		ease: "backInOut"
+	});
+	// var lives = ["life1", "life2", "life3"];
+	// var life;
+	// for(var i=0; i<lives.length; i++){
+	// 	life = lives[i];
+	// 	//zog(life);
+	// 	life1.animate({
+	// 		time: 1000,
+	// 		props: {y: -50}
+	// 	});
+	// }	
+	
+
+
+//makeGame();
+
+//*******************cursor*******************
+
+  document.body.style.cursor = "none";
+
+  var cursorlight = new Container().center(theGame);
+
+  var glow = new Circle(3, "white")
+    .alp(.2)
+    .addTo(cursorlight)
+    .animate(
+      {props:{scale:15, alpha:0},
+      loop: true,
+      time:2000     
+      //rewind: true
+      });
+
+
+  var cursor = new MotionController({
+        target: cursorlight, 
+        type: "mousemove",
+        speed:1000,
+        damp: 1
+    });
+  
+  cursorlight.mouseEnabled = false;
+  cursorlight.mouseChildren = false;
+
+    Ticker.add(function() {
+
+        var trail = new Emitter({
+          obj: new Circle({
+              radius: 2, 
+              color: "white"
+              }).alp(.5),
+            interval:200,
+            life:1000,
+            decayTime:1000,
+            num:1,
+            gravity:0,
+            force: 1,
+            fade: true
+        })
+          .addTo(theGame)
+          .loc(stage.mouseX, stage.mouseY)
+          .animate({
+            props:{alpha:0},
+            time:500,
+            call: function(target){target.dispose();
+            }
+          });  
+          trail.mouseEnabled = false;
+          trail.mouseChildren = false;
+    });
+  
+  var pen = new Pen({color: "white", penType: "line", damp: .8, draggable: false, size: 5, nib:new Circle(20, "white").alp(.1)}).center().top();
+  pen.paper.alp(.4);
+  
+  var draw = new MotionController({
+      target: pen, 
+      type: "pressmove",
+      speed:500,
+      damp: 1,
+      mousedownIncludes: [bg]
+  });
+
+  pen.on("stop", function(){
+    pen.lastSegment.animate({
+            props:{alpha:0},
+            time:200,
+            call: function(target){target.removeFrom();
+            }  
+      });
+  });
+
+
+
+//******************game*******************
+	
+
+	
+  	var circlePapa = new Container(stageW, stageH).center(theGame);
+
+	var startingPositions = [[stageW+80,stageH+80],[stageW+80,-80],[-80,-80],[-80,stageH+80],[-80,stageH/2],[stageW+80,stageH/2],[stageW/2,stageH+80],[stageW/2,-80]];
+  	
+  	function placeBot(){
+  	position = shuffle(startingPositions)[0];
+  	}
+
+  	function placeGeo(){
+  	position = shuffle(startingPositions)[0];
+  	}
+
+    function makeBot(e){
+    	placeBot();
+    	bot = frame.asset("greybot.png").clone().sca(.2).pos(position[0], position[1]).addTo(circlePapa);
+		bot.animate({
+		  	props: {rotation: 360, x:stageW/2, y:stageH/2},
+		  	time: 8000
+		});
+    }
+
+    function makeGeo(e){
+    	placeGeo();
+        geo = frame.asset("geo.png").clone().sca(.3).pos(position[0], position[1]).addTo(circlePapa);
+        geo.animate({
+		  	props: {rotation: 600, x:stageW/2, y:stageH/2},
+		  	time: 8000
+		});
+    }
+
+    function makeVirus(e){
+    	placeBot();
+        virus = frame.asset("virus.png").clone().sca(.3).pos(position[0], position[1]).addTo(circlePapa);
+        virus.animate({
+		  	props: {rotation: 100, x:stageW/2, y:stageH/2},
+		  	time: 6000
+		});
+    }
+
+    bots = interval({min:500, max:1000}, function(){
+        makeBot();
+    });  
+
+    bigBoys = interval({min:5000, max:8000}, function(){
+        makeVirus();
+    }); 
+
+    var geos = interval({min:4000, max:6000}, function(){
+        makeGeo();
+    }); 
+
+   	count = 0;
+    var scoreLabel = new Label({
+    	text:count,
+    	color: "white",
+    	align: "center"
+	}).sca(.6).addTo(brainContainer).alp(1).pos(191,122);
+
+	var penEvent = pen.on("drawing", function () {
+		circlePapa.loop(function(bot){
+			if (bot && pen.nib.hitTestRect(bot)){
+				bot.removeFrom();
+				//zog(++count);
+				scoreLabel.text = ++count;
+			}
+			if (geo && pen.nib.hitTestRect(geo)){
+				geo.removeFrom();
+				scoreLabel.text = ++count;
+			}
+			if (virus && pen.nib.hitTestRect(virus)){
+				virus.removeFrom();
+				scoreLabel.text = ++count;
+			}
+			if (brainContainer.hitTestCircle(pen.nib)){
+				//pen.off("drawing", penEvent);
+		 		hitBrain();
+		 		fizzle.play({volume:.4});
+		 		loseLife();
+			}
+		}, true) //loops backwards through the array so the index numbers don't get mixed up for the removing 
+	});
+	
+	// pen.on("stop", function(){
+	// 	penEvent = pen.on("drawing", penEvent); //reassign to pen event IMPORTANT
+	// });
+
+	//var s = series("life3", "life3grey", "life2", "life2grey", "life1", "life1grey");
+	var s = series(life3, life3grey, life2, life2grey, life1, life1grey);
+
+	function loseLife(){
+		var currentLife = s();
+		//zog(currentLife);
+		currentLife.animate({
+		time: 500,
+		props: {alpha: 0},
+		});
+
+	//if (lifeContainer.getChildAt([0]).alpha == 0){
+	if (life1grey.alpha == 0){
+			theGame.removeAllChildren();
+			stopBots();
+			//zog("done");
+			gameOver();
+			lost();
+	}
+
+	}
+  
+
+	function hit(){
+		laser.play({volume:.6});
+		greybrain.animate({
+			props: {alpha: 1, scale: .21},
+			time: 200,
+			loopWait: 500, 
+			rewind: true	
+		});
+	}
+	
+	function hitBrain(){
+		brainContainer.animate({
+			props: {alpha: 0, scale: .8},
+			time: 100,
+			rewind: true	
+		});
+	}
+
+
+
+	Ticker.add(function () {
+	    circlePapa.loop(function(bot){
+			if (bot && brainContainer.hitTestRect(bot)){
+				bot.removeFrom();
+				loseLife();
+			 	hit();
+			 	stage.update();
+		    }
+		    if (geo && brainContainer.hitTestRect(geo)){
+				geo.removeFrom();
+			 	loseLife();
+			 	hit();
+				}
+			if (virus && brainContainer.hitTestRect(virus)){
+				virus.removeFrom();
+			 	loseLife();
+			 	hit();
+				}
+	    }, true)
+
+	});
+
+	// timeout(25000, function(){
+	// 	bots = interval({min:800, max:100}, function(){
+ //        	makeBot();
+ //    	});  
+
+ //    	geo = interval({min:4000, max:6000}, function(){
+ //        	makeGeo();
+ //    	}); 
+	// });
+	function stopBots(){
+		bots.pause(true);
+		// geo.pause(true);
+		bigBoys.pause(true);
+		stage.update();
+	}
+
+	timeOut = timeout(30000, function() {
+		if (life1grey.alpha == 1){
+		theGame.removeAllChildren();
+		bots.pause(true);
+		geos.pause(true);
+		winGame();
+		stage.update();
+		}
+	});
+
+}
+	
+    stage.update();
+
+}); // end of ready
+
+</script>
+
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+
+</head>
+
+<body>
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+</body>
+</html>
