@@ -10,7 +10,7 @@
 <!-- ZIM is free to use. You can donate to help improve ZIM at http://zimjs.com/donate 	-->
 
 <!--************Project created Cleo Lant and Dan Zen*******************-->
-
+<!-- <script>zon = false;</script> -->
 <script src="https://d309knd7es5f10.cloudfront.net/createjs_1.1.js"></script>
 <!-- <script src="https://d309knd7es5f10.cloudfront.net/createjs_1.1_min.js"></script> -->
 <script src="https://d309knd7es5f10.cloudfront.net/zim_9.4.0.js"></script>
@@ -25,12 +25,13 @@
 // "full"	sets stage to window size with no scaling
 // "tagID"	add canvas to HTML tag of ID - set to dimensions if provided - no scaling
 
+
 var scaling = "fit"; // this will resize to fit inside the screen dimensions
 var width = 1024;
 var height = 768;
 var color = "black"; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "design2.png", "gameover.png", "logo.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "greybot2.png", "geo.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fizzle.mp3", "tech-heart.png", "heart3grey.png", "heart2grey.png", "heart1grey.png", "tryagain.png", "protect.png"];
+var assets = ["bensound-scifi.mp3", "bg.png", "brain1.png", "brain2.png", "braingrey.png", "design1.png", "design2.png", "gameover.png", "logo.png", "win.png", "whitebot.png", "heart1.png", "heart2.png", "heart3.png", "greybot.png", "greybot2.png", "geo.png", "tagline.png", "stutter.mp3", "blip.mp3", "laser.mp3", "fizzle.mp3", "tech-heart.png", "heart3grey.png", "heart2grey.png", "heart1grey.png", "tryagain.png", "protect.png", "virus.png"];
 var path = "assets/";
 
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter({corner:0, backgroundColor:"black", foregroundColor: "lime"}));
@@ -62,7 +63,8 @@ frame.on("ready", function() {
 	var life1; 	var life1grey;
 	var life2;	var life2grey;
 	var life3;	var life3grey;
-
+	var count;
+	var virus;
   	var bot; var bots;
   	var geo;
   	var position;
@@ -146,16 +148,16 @@ gameIntro();
 		props: {alpha: 0},
 		time: 1000,
 	});
-	//createjs.Sound.stop()
+	
 	}
 
 
 	function gameOver(){
 	
-	timeOut.pause(true);
+	introContainer.removeAllChildren();
 
 	stutter.play();
-
+	//createjs.Sound.stop()
 	gameOverContainer = new Container(stageW, stageH).centerReg().alp(1);
 	var gameOverLogo = frame.asset("gameover.png").sca(.35).centerReg(gameOverContainer).mov(null, -100).alp(.4);;
 	design2 = frame.asset("design2.png").sca(.5).addTo(gameOverContainer).mov(-30, 60).alp(.1);
@@ -213,9 +215,14 @@ function winGame(){
 	});
 	
 	var winContainer = new Container(stageW, stageH).centerReg();
+
+	winContainer.animate({
+		props:{y:stageH, alpha:0},
+		time: 2000,
+		from:true});
+
 	var successLogo = frame.asset("win.png").sca(.35).centerReg(winContainer).mov(null, -50).alp(.35);
 	var design2 = frame.asset("design2.png").sca(.5).addTo(winContainer).alp(.1).mov(null, 100);
-	
 	
 	var playButton = new Button({
 		label: "revert",
@@ -469,37 +476,64 @@ function makeGame(){
 
     function makeBot(e){
     	placeBot();
-    	bot = frame.asset("greybot.png").clone().centerReg().sca(.2).pos(position[0], position[1]).addTo(circlePapa);
+    	bot = frame.asset("greybot.png").clone().sca(.2).pos(position[0], position[1]).addTo(circlePapa);
 		bot.animate({
 		  	props: {rotation: 360, x:stageW/2, y:stageH/2},
-		  	time: 9000
+		  	time: 8000
 		});
     }
 
     function makeGeo(e){
-        geo = frame.asset("geo.png").clone().sca(.2).pos(position[0], position[1]).addTo(circlePapa);
+    	placeGeo();
+        geo = frame.asset("geo.png").clone().sca(.3).pos(position[0], position[1]).addTo(circlePapa);
         geo.animate({
 		  	props: {rotation: 600, x:stageW/2, y:stageH/2},
-		  	time: 5000
+		  	time: 8000
 		});
     }
 
-    var bots = interval({min:1000, max:2000}, function(){
+    function makeVirus(e){
+    	placeBot();
+        virus = frame.asset("virus.png").clone().sca(.3).pos(position[0], position[1]).addTo(circlePapa);
+        virus.animate({
+		  	props: {rotation: 100, x:stageW/2, y:stageH/2},
+		  	time: 6000
+		});
+    }
+
+    bots = interval({min:500, max:1000}, function(){
         makeBot();
     });  
 
-    var geos = interval({min:5000, max:8000}, function(){
+    bigBoys = interval({min:5000, max:8000}, function(){
+        makeVirus();
+    }); 
+
+    var geos = interval({min:4000, max:6000}, function(){
         makeGeo();
     }); 
 
+   	count = 0;
+    var scoreLabel = new Label({
+    	text:count,
+    	color: "white",
+    	align: "center"
+	}).sca(.6).addTo(brainContainer).alp(1).pos(191,122);
 
 	var penEvent = pen.on("drawing", function () {
 		circlePapa.loop(function(bot){
-			if (pen.nib.hitTestRect(bot)){
+			if (bot && pen.nib.hitTestRect(bot)){
 				bot.removeFrom();
+				//zog(++count);
+				scoreLabel.text = ++count;
 			}
-			if (pen.nib.hitTestRect(geo)){
+			if (geo && pen.nib.hitTestRect(geo)){
 				geo.removeFrom();
+				scoreLabel.text = ++count;
+			}
+			if (virus && pen.nib.hitTestRect(virus)){
+				virus.removeFrom();
+				scoreLabel.text = ++count;
 			}
 			if (brainContainer.hitTestCircle(pen.nib)){
 				//pen.off("drawing", penEvent);
@@ -526,8 +560,9 @@ function makeGame(){
 		});
 
 	//if (lifeContainer.getChildAt([0]).alpha == 0){
-	if (life1.alpha == 0){
+	if (life1grey.alpha == 0){
 			theGame.removeAllChildren();
+			stopBots();
 			//zog("done");
 			gameOver();
 			lost();
@@ -554,21 +589,27 @@ function makeGame(){
 		});
 	}
 
+
+
 	Ticker.add(function () {
 	    circlePapa.loop(function(bot){
-			if (brainContainer.hitTestRect(bot)){
+			if (bot && brainContainer.hitTestRect(bot)){
 				bot.removeFrom();
+				loseLife();
 			 	hit();
-			 	loseLife();
+			 	stage.update();
 		    }
-	    }, true)
-		circlePapa.loop(function(geo){
-			if (brainContainer.hitTestRect(geo)){
+		    if (geo && brainContainer.hitTestRect(geo)){
 				geo.removeFrom();
-			 	//zog("hit bad");
+			 	loseLife();
 			 	hit();
 				}
-		}, true)
+			if (virus && brainContainer.hitTestRect(virus)){
+				virus.removeFrom();
+			 	loseLife();
+			 	hit();
+				}
+	    }, true)
 
 	});
 
@@ -581,18 +622,21 @@ function makeGame(){
  //        	makeGeo();
  //    	}); 
 	// });
-	// function stopBots(){
-	// 	bots.pause(true);
-	// 	geo.pause(true);
-	// }
-	timeOut = timeout(3000, function() {
-		// if(life1.alpha == 0){
+	function stopBots(){
+		bots.pause(true);
+		// geo.pause(true);
+		bigBoys.pause(true);
+		stage.update();
+	}
+
+	timeOut = timeout(30000, function() {
+		if (life1grey.alpha == 1){
 		theGame.removeAllChildren();
 		bots.pause(true);
 		geos.pause(true);
 		winGame();
 		stage.update();
-		// }
+		}
 	});
 
 }
